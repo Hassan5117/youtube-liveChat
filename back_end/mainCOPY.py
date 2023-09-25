@@ -1,14 +1,22 @@
-
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from app import capture_chat_data
 from db import get_database_connection, insert_document
 from analytics import get_hype_moments, get_moments
-def main():
+
+app = Flask(__name__)
+CORS(app)  # This allows for cross-origin requests
+
+@app.route('/api/mainCOPY', methods=['POST'])
+def get_greeting():
+    data = request.json
 
     # Prompt user for YouTube live stream URL
-    url = input("Please enter the YouTube live stream URL: ")
+    # url = input("Please enter the YouTube live stream URL: ")
     
     # Capture chat data using app.py
+    url = data.get('input')
     chat_data = capture_chat_data(url)
     
     # Connect to MongoDB and get the collection using db.py
@@ -28,9 +36,11 @@ def main():
     # results = <Call to any function in analytics.py>
     # print(results)
     print(get_hype_moments(get_moments(collection)))
+    results = get_hype_moments(get_moments(collection))
+    return jsonify(message=results)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
-
-if __name__ == "__main__":
-    main()
 #try storing url as well, and comparing url to see if needs to access the api or not to save time

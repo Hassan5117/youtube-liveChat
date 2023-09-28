@@ -45,7 +45,7 @@ def get_moments(collection):
     return dict
 
 
-def get_hype_moments(moments_dict):
+def get_hype_moments(moments_dict, stream_url):
 
     sorted_counts = sorted(moments_dict.values(), reverse=True)
     top_1_percent_index = int(0.01 * len(sorted_counts))

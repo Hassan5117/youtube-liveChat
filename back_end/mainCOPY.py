@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from app import capture_chat_data
-from db import get_database_connection, insert_document
+from db import get_database_connection, insert_document, get_or_create_collection, sanitize_url
 from analytics import get_hype_moments, get_moments
 
 app = Flask(__name__)
@@ -21,7 +21,8 @@ def get_greeting():
     
     # Connect to MongoDB and get the collection using db.py
     db = get_database_connection()
-    collection = db.get_collection("test3")
+    # collection = db.get_collection("test3")
+    collection = get_or_create_collection(db, url)
     collection.create_index([("message_id", 1)], unique=True)  # Ensure unique message IDs
     
     # Insert chat data into MongoDB
@@ -32,11 +33,9 @@ def get_greeting():
             print(f"Error inserting message with ID {document['message_id']}: {e} \n")
             break
 
-    # Optional: Further processing or analysis using analytics.py
-    # results = <Call to any function in analytics.py>
-    # print(results)
-    print(get_hype_moments(get_moments(collection)))
-    results = get_hype_moments(get_moments(collection))
+
+    print(get_hype_moments(get_moments(collection), url))
+    results = get_hype_moments(get_moments(collection), url)
     return jsonify(message=results)
 
 if __name__ == '__main__':
